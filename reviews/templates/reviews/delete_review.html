@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Supprimer une critique - LITRevu</title>
+</head>
+<body>
+    <h1>Supprimer votre critique</h1>
+
+    <p>
+        Voulez-vous vraiment supprimer
+        « {{ review.headline }} » ?
+    </p>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Supprimer</button>
+    </form>
+
+    <a href="{% url 'feed' %}">Annuler</a>
+</body>
+</html>

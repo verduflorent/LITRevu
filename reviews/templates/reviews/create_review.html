@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Créer une critique - LITRevu</title>
+</head>
+<body>
+    <h1>Créer une critique</h1>
+
+    <h2>Vous répondez à :</h2>
+    <p>{{ ticket.title }}</p>
+    <p>{{ ticket.description }}</p>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <button type="submit">Envoyer</button>
+    </form>
+
+    <a href="{% url 'feed' %}">Retour au flux</a>
+</body>
+</html>
