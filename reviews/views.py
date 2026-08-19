@@ -2,6 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth import get_user_model
 from django.contrib import messages
+from django.db.models import Q
 
 from .forms import FollowUserForm, ReviewForm, TicketForm
 from .models import Review, Ticket, UserFollows
@@ -11,10 +12,36 @@ User = get_user_model()
 
 @login_required
 def feed(request):
-    tickets = Ticket.objects.all()
-    reviews = Review.objects.all()
+    followed_users = UserFollows.objects.filter(
+        user=request.user
+    ).values_list(
+        'followed_user',
+        flat=True
+    )
 
-    print("REVIEWS DANS LE FEED :", reviews.count())
+    tickets = Ticket.objects.filter(
+        Q(user=request.user) |
+        Q(user__in=followed_users)
+    )
+
+    reviews = Review.objects.filter(
+        Q(user=request.user) |
+        Q(user__in=followed_users) |
+        Q(ticket__user=request.user)
+    )
+
+    for ticket in tickets:
+        ticket.content_type = 'TICKET'
+
+    for review in reviews:
+        review.content_type = 'REVIEW'
+
+    posts = list(tickets) + list(reviews)
+
+    posts.sort(
+        key=lambda post: post.time_created,
+        reverse=True
+    )
 
     return render(
         request,
@@ -22,6 +49,7 @@ def feed(request):
         {
             'tickets': tickets,
             'reviews': reviews,
+            'posts': posts,
         },
     )
 

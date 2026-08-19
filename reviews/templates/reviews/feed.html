@@ -18,57 +18,56 @@
 
     <a href="{% url 'follow_users' %}">Abonnements</a>
 
-    <h2>Tickets</h2>
+    <h2>Flux</h2>
 
-    {% for ticket in tickets %}
-        <article>
-            <h3>{{ ticket.title }}</h3>
+    {% for post in posts %}
 
-            <p>{{ ticket.description }}</p>
+        {% if post.content_type == 'TICKET' %}
 
-            <p>
-                Publié par {{ ticket.user.username }}
-                le {{ ticket.time_created }}
-            </p>
+            <article>
+                <h3>{{ post.title }}</h3>
 
-            {% if ticket.user == user %}
-                <a href="{% url 'edit_ticket' ticket.id %}">Modifier</a>
-                <a href="{% url 'delete_ticket' ticket.id %}">Supprimer</a>
-            {% endif %}
+                <p>{{ post.description }}</p>
 
-            <a href="{% url 'create_review' ticket.id %}">
-                Créer une critique en réponse
-            </a>
+                <p>
+                    Publié par {{ post.user.username }}
+                    le {{ post.time_created }}
+                </p>
 
-        </article>
+                {% if post.user == user %}
+                    <a href="{% url 'edit_ticket' post.id %}">Modifier</a>
+                    <a href="{% url 'delete_ticket' post.id %}">Supprimer</a>
+                {% endif %}
+
+                <a href="{% url 'create_review' post.id %}">
+                    Créer une critique en réponse
+                </a>
+            </article>
+
+        {% elif post.content_type == 'REVIEW' %}
+
+            <article>
+                <h3>{{ post.headline }}</h3>
+
+                <p>Note : {{ post.rating }}/5</p>
+
+                <p>{{ post.body }}</p>
+
+                <p>
+                    Critique de {{ post.user.username }}
+                    en réponse à "{{ post.ticket.title }}"
+                </p>
+
+                {% if post.user == user %}
+                    <a href="{% url 'edit_review' post.id %}">Modifier</a>
+                    <a href="{% url 'delete_review' post.id %}">Supprimer</a>
+                {% endif %}
+            </article>
+
+        {% endif %}
+
     {% empty %}
-        <p>Aucun ticket pour le moment.</p>
-    {% endfor %}
-
-    <h2>Critiques</h2>
-
-    {% for review in reviews %}
-        <article>
-            <h3>{{ review.headline }}</h3>
-
-            <p>Note : {{ review.rating }}/5</p>
-
-            <p>{{ review.body }}</p>
-
-            <p>
-                Critique de {{ review.user.username }}
-                en réponse à "{{ review.ticket.title }}"
-            </p>
-
-            {% if review.user == user %}
-                <a href="{% url 'edit_review' review.id %}">Modifier</a>
-                <a href="{% url 'delete_review' review.id %}">Supprimer</a>
-            {% endif %}
-
-        </article>
-
-    {% empty %}
-        <p>Aucune critique pour le moment.</p>
+        <p>Votre flux est vide.</p>
     {% endfor %}
 </body>
 </html>
