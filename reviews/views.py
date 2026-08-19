@@ -1,8 +1,12 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
+from django.contrib.auth import get_user_model
+from django.contrib import messages
 
-from .forms import ReviewForm, TicketForm
-from .models import Review, Ticket
+from .forms import FollowUserForm, ReviewForm, TicketForm
+from .models import Review, Ticket, UserFollows
+
+User = get_user_model()
 
 
 @login_required
@@ -181,3 +185,83 @@ def create_ticket_and_review(request):
             'review_form': review_form,
         },
     )
+
+@login_required
+def follow_users(request):
+    form = FollowUserForm()
+
+    if request.method == 'POST':
+        form = FollowUserForm(request.POST)
+
+        if form.is_valid():
+            username = form.cleaned_data['username']
+
+            try:
+                followed_user = User.objects.get(username=username)
+            except User.DoesNotExist:
+                messages.error(
+                    request,
+                    "Cet utilisateur n'existe pas."
+                )
+                return redirect('follow_users')
+
+            if followed_user == request.user:
+                messages.error(
+                    request,
+                    "Vous ne pouvez pas vous suivre vous-même."
+                )
+                return redirect('follow_users')
+
+            follow, created = UserFollows.objects.get_or_create(
+                user=request.user,
+                followed_user=followed_user
+            )
+
+            if created:
+                messages.success(
+                    request,
+                    "Utilisateur suivi."
+                )
+            else:
+                messages.info(
+                    request,
+                    "Vous suivez déjà cet utilisateur."
+                )
+
+            return redirect('follow_users')
+
+    following = UserFollows.objects.filter(
+        user=request.user
+    )
+
+    followers = UserFollows.objects.filter(
+        followed_user=request.user
+    )
+
+    return render(
+        request,
+        'reviews/follow_users.html',
+        {
+            'form': form,
+            'following': following,
+            'followers': followers,
+        },
+    )
+
+@login_required
+def unfollow_user(request, user_id):
+    followed_user = get_object_or_404(
+        User,
+        id=user_id
+    )
+
+    follow = get_object_or_404(
+        UserFollows,
+        user=request.user,
+        followed_user=followed_user
+    )
+
+    if request.method == 'POST':
+        follow.delete()
+
+    return redirect('follow_users')
