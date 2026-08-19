@@ -293,3 +293,29 @@ def unfollow_user(request, user_id):
         follow.delete()
 
     return redirect('follow_users')
+
+@login_required
+def posts(request):
+    tickets = Ticket.objects.filter(
+        user=request.user
+    )
+
+    reviews = Review.objects.filter(
+        user=request.user
+    )
+
+    reviews_on_my_tickets = Review.objects.filter(
+        ticket__user=request.user
+    ).exclude(
+        user=request.user
+    )
+
+    return render(
+        request,
+        'reviews/posts.html',
+        {
+            'tickets': tickets,
+            'reviews': reviews,
+            'reviews_on_my_tickets': reviews_on_my_tickets,
+        },
+    )

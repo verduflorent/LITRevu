@@ -14,4 +14,5 @@ urlpatterns = [
     path('reviews/create/', views.create_ticket_and_review, name='create_ticket_and_review'),
     path('follows/', views.follow_users, name='follow_users'),
     path('follows/<int:user_id>/delete/', views.unfollow_user, name='unfollow_user'),
+    path('posts/', views.posts, name='posts'),
 ]
