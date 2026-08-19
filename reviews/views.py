@@ -70,7 +70,11 @@ def edit_ticket(request, ticket_id):
 
 @login_required
 def delete_ticket(request, ticket_id):
-    ticket = get_object_or_404(Ticket, id=ticket_id)
+    ticket = get_object_or_404(
+        Ticket,
+        id=ticket_id,
+        user=request.user
+    )
 
     if request.method == 'POST':
         ticket.delete()
