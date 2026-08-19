@@ -1,19 +1,54 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Modifier un ticket - LITRevu</title>
-</head>
-<body>
-    <h1>Modifier votre ticket</h1>
+{% extends 'base.html' %}
 
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
+{% block title %}
+    Modifier un ticket - LITRevu
+{% endblock %}
 
-        <button type="submit">Enregistrer</button>
-    </form>
+{% block content %}
+    <section class="form-page">
+        <h1>Modifier votre ticket</h1>
 
-    <a href="{% url 'feed' %}">Retour au flux</a>
-</body>
-</html>
+        <form
+            method="post"
+            enctype="multipart/form-data"
+            class="content-form"
+        >
+            {% csrf_token %}
+
+            {{ form.non_field_errors }}
+
+            <div class="form-field">
+                <label for="{{ form.title.id_for_label }}">
+                    Titre
+                </label>
+
+                {{ form.title }}
+                {{ form.title.errors }}
+            </div>
+
+            <div class="form-field">
+                <label for="{{ form.description.id_for_label }}">
+                    Description
+                </label>
+
+                {{ form.description }}
+                {{ form.description.errors }}
+            </div>
+
+            <div class="form-field">
+                <label for="{{ form.image.id_for_label }}">
+                    Image
+                </label>
+
+                {{ form.image }}
+                {{ form.image.errors }}
+            </div>
+
+            <div class="form-actions">
+                <button type="submit">
+                    Enregistrer
+                </button>
+            </div>
+        </form>
+    </section>
+{% endblock %}

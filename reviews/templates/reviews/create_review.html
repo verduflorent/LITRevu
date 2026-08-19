@@ -1,23 +1,68 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Créer une critique - LITRevu</title>
-</head>
-<body>
-    <h1>Créer une critique</h1>
+{% extends 'base.html' %}
 
-    <h2>Vous répondez à :</h2>
-    <p>{{ ticket.title }}</p>
-    <p>{{ ticket.description }}</p>
+{% block title %}
+    Créer une critique - LITRevu
+{% endblock %}
 
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
+{% block content %}
+    <section class="form-page">
+        <h1>Créer une critique</h1>
 
-        <button type="submit">Envoyer</button>
-    </form>
+        <div class="review-ticket">
+            <p>Vous êtes en train de poster en réponse à :</p>
 
-    <a href="{% url 'feed' %}">Retour au flux</a>
-</body>
-</html>
+            <h2>{{ ticket.title }}</h2>
+
+            {% if ticket.description %}
+                <p>{{ ticket.description }}</p>
+            {% endif %}
+
+            {% if ticket.image %}
+                <img
+                    src="{{ ticket.image.url }}"
+                    alt="Image associée à {{ ticket.title }}"
+                    class="post-image"
+                >
+            {% endif %}
+        </div>
+
+        <form method="post" class="content-form">
+            {% csrf_token %}
+
+            {{ form.non_field_errors }}
+
+            <div class="form-field">
+                <label for="{{ form.headline.id_for_label }}">
+                    Titre
+                </label>
+
+                {{ form.headline }}
+                {{ form.headline.errors }}
+            </div>
+
+            <div class="form-field">
+                <label for="{{ form.rating.id_for_label }}">
+                    Note
+                </label>
+
+                {{ form.rating }}
+                {{ form.rating.errors }}
+            </div>
+
+            <div class="form-field">
+                <label for="{{ form.body.id_for_label }}">
+                    Commentaire
+                </label>
+
+                {{ form.body }}
+                {{ form.body.errors }}
+            </div>
+
+            <div class="form-actions">
+                <button type="submit">
+                    Envoyer
+                </button>
+            </div>
+        </form>
+    </section>
+{% endblock %}

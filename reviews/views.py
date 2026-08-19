@@ -30,8 +30,18 @@ def feed(request):
         Q(ticket__user=request.user)
     )
 
+    reviewed_ticket_ids = set(
+        Review.objects.filter(
+            user=request.user
+        ).values_list(
+            'ticket_id',
+            flat=True
+        )
+    )
+
     for ticket in tickets:
         ticket.content_type = 'TICKET'
+        ticket.can_review = ticket.id not in reviewed_ticket_ids
 
     for review in reviews:
         review.content_type = 'REVIEW'
@@ -47,8 +57,6 @@ def feed(request):
         request,
         'reviews/feed.html',
         {
-            'tickets': tickets,
-            'reviews': reviews,
             'posts': posts,
         },
     )
@@ -121,6 +129,17 @@ def delete_ticket(request, ticket_id):
 @login_required
 def create_review(request, ticket_id):
     ticket = get_object_or_404(Ticket, id=ticket_id)
+
+    if Review.objects.filter(
+        ticket=ticket,
+        user=request.user
+    ).exists():
+        messages.error(
+            request,
+            "Vous avez déjà publié une critique pour ce ticket."
+        )
+        return redirect('feed')
+
     form = ReviewForm()
 
     if request.method == 'POST':
@@ -309,6 +328,18 @@ def posts(request):
     ).exclude(
         user=request.user
     )
+
+    reviewed_ticket_ids = set(
+        Review.objects.filter(
+            user=request.user
+        ).values_list(
+            'ticket_id',
+            flat=True
+        )
+    )
+
+    for ticket in tickets:
+        ticket.can_review = ticket.id not in reviewed_ticket_ids
 
     return render(
         request,

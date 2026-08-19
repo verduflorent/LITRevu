@@ -1,86 +1,41 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Mes posts - LITRevu</title>
-</head>
-<body>
- <h1>Mes posts</h1>
+{% extends 'base.html' %}
 
-<h2>Mes tickets</h2>
+{% block title %}
+    Mes posts - LITRevu
+{% endblock %}
 
-{% for ticket in tickets %}
-    <article>
-        <h3>{{ ticket.title }}</h3>
+{% block content %}
+    <section class="posts-page">
+        <h1>Vos posts</h1>
 
-        <p>{{ ticket.description }}</p>
+        <div class="posts-section">
+            <h2>Mes tickets</h2>
 
-        <p>
-            Publié le {{ ticket.time_created }}
-        </p>
+            {% for ticket in tickets %}
+                {% include 'reviews/ticket_snippet.html' with post=ticket %}
+            {% empty %}
+                <p>Vous n'avez publié aucun ticket.</p>
+            {% endfor %}
+        </div>
 
-        <a href="{% url 'edit_ticket' ticket.id %}">
-            Modifier
-        </a>
+        <div class="posts-section">
+            <h2>Mes critiques</h2>
 
-        <a href="{% url 'delete_ticket' ticket.id %}">
-            Supprimer
-        </a>
-    </article>
-{% empty %}
-    <p>Vous n'avez publié aucun ticket.</p>
-{% endfor %}
+            {% for review in reviews %}
+                {% include 'reviews/review_snippet.html' with post=review %}
+            {% empty %}
+                <p>Vous n'avez publié aucune critique.</p>
+            {% endfor %}
+        </div>
 
+        <div class="posts-section">
+            <h2>Réponses à mes tickets</h2>
 
-<h2>Mes critiques</h2>
-
-{% for review in reviews %}
-    <article>
-        <h3>{{ review.headline }}</h3>
-
-        <p>Note : {{ review.rating }}/5</p>
-
-        <p>{{ review.body }}</p>
-
-        <p>
-            En réponse à "{{ review.ticket.title }}"
-        </p>
-
-        <a href="{% url 'edit_review' review.id %}">
-            Modifier
-        </a>
-
-        <a href="{% url 'delete_review' review.id %}">
-            Supprimer
-        </a>
-    </article>
-{% empty %}
-    <p>Vous n'avez publié aucune critique.</p>
-{% endfor %}
-
-
-<h2>Réponses à mes tickets</h2>
-
-{% for review in reviews_on_my_tickets %}
-    <article>
-        <h3>{{ review.headline }}</h3>
-
-        <p>Note : {{ review.rating }}/5</p>
-
-        <p>{{ review.body }}</p>
-
-        <p>
-            {{ review.user.username }}
-            a répondu à "{{ review.ticket.title }}"
-        </p>
-    </article>
-{% empty %}
-    <p>Aucune réponse à vos tickets.</p>
-{% endfor %}
-
-
-<a href="{% url 'feed' %}">
-    Retour au flux
-</a>
-</body>
-</html>
+            {% for review in reviews_on_my_tickets %}
+                {% include 'reviews/review_snippet.html' with post=review %}
+            {% empty %}
+                <p>Aucune réponse à vos tickets.</p>
+            {% endfor %}
+        </div>
+    </section>
+{% endblock %}

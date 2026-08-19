@@ -1,75 +1,35 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Flux - LITRevu</title>
-</head>
-<body>
-    <h1>Flux</h1>
-    <p>Bienvenue sur votre flux.</p>
+{% extends 'base.html' %}
 
-    <a href="{% url 'logout' %}">Se déconnecter</a>
+{% block title %}
+    Flux - LITRevu
+{% endblock %}
 
-    <a href="{% url 'create_ticket' %}">Créer un ticket</a>
+{% block content %}
+    <section class="feed-page">
+        <div class="feed-actions">
+            <a class="button-link" href="{% url 'create_ticket' %}">
+                Demander une critique
+            </a>
 
-    <a href="{% url 'create_ticket_and_review' %}">
-        Créer une critique
-    </a>
+            <a class="button-link" href="{% url 'create_ticket_and_review' %}">
+                Créer une critique
+            </a>
+        </div>
 
-    <a href="{% url 'follow_users' %}">Abonnements</a>
+        <div class="feed-list">
+            {% for post in posts %}
 
-    <a href="{% url 'posts' %}">Mes posts</a>
+                {% if post.content_type == 'TICKET' %}
+                    {% include 'reviews/ticket_snippet.html' %}
 
-    <h2>Flux</h2>
-
-    {% for post in posts %}
-
-        {% if post.content_type == 'TICKET' %}
-
-            <article>
-                <h3>{{ post.title }}</h3>
-
-                <p>{{ post.description }}</p>
-
-                <p>
-                    Publié par {{ post.user.username }}
-                    le {{ post.time_created }}
-                </p>
-
-                {% if post.user == user %}
-                    <a href="{% url 'edit_ticket' post.id %}">Modifier</a>
-                    <a href="{% url 'delete_ticket' post.id %}">Supprimer</a>
+                {% elif post.content_type == 'REVIEW' %}
+                    {% include 'reviews/review_snippet.html' %}
                 {% endif %}
 
-                <a href="{% url 'create_review' post.id %}">
-                    Créer une critique en réponse
-                </a>
-            </article>
+            {% empty %}
+                <p>Votre flux est vide.</p>
+            {% endfor %}
+        </div>
+    </section>
 
-        {% elif post.content_type == 'REVIEW' %}
-
-            <article>
-                <h3>{{ post.headline }}</h3>
-
-                <p>Note : {{ post.rating }}/5</p>
-
-                <p>{{ post.body }}</p>
-
-                <p>
-                    Critique de {{ post.user.username }}
-                    en réponse à "{{ post.ticket.title }}"
-                </p>
-
-                {% if post.user == user %}
-                    <a href="{% url 'edit_review' post.id %}">Modifier</a>
-                    <a href="{% url 'delete_review' post.id %}">Supprimer</a>
-                {% endif %}
-            </article>
-
-        {% endif %}
-
-    {% empty %}
-        <p>Votre flux est vide.</p>
-    {% endfor %}
-</body>
-</html>
+{% endblock %}

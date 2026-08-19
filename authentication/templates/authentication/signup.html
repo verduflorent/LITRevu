@@ -1,18 +1,45 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Inscription - LITRevu</title>
-</head>
-<body>
-    <h1>Inscrivez-vous</h1>
+{% extends 'base.html' %}
 
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">S'inscrire</button>
-    </form>
+{% block title %}
+    Inscription - LITRevu
+{% endblock %}
 
-    <a href="{% url 'login' %}">Retour</a>
-</body>
-</html>
+{% block content %}
+    <section class="signup-page">
+        <h1>Inscrivez-vous</h1>
+
+        <form method="post" class="content-form">
+            {% csrf_token %}
+
+            {{ form.non_field_errors }}
+
+            {% for field in form %}
+                <div class="form-field">
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                    </label>
+
+                    {{ field }}
+
+                    {{ field.errors }}
+
+                    {% if field.help_text %}
+                        <div class="help-text">
+                            {{ field.help_text }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <div class="signup-actions">
+                <a href="{% url 'login' %}" class="button-link">
+                    Retourner
+                </a>
+
+                <button type="submit">
+                    S'inscrire
+                </button>
+            </div>
+        </form>
+    </section>
+{% endblock %}

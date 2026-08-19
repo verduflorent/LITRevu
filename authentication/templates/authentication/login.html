@@ -1,19 +1,53 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Connexion - LITRevu</title>
-</head>
-<body>
-    <h1>LITRevu</h1>
+{% extends 'base.html' %}
 
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Se connecter</button>
+{% block title %}
+    Connexion - LITRevu
+{% endblock %}
 
-        <a href="{% url 'signup' %}">S'inscrire</a>
+{% block content %}
+    <section class="login-page">
 
-    </form>
-</body>
-</html>
+        <div class="signup-panel">
+            <h1>Inscrivez-vous maintenant</h1>
+
+            <a href="{% url 'signup' %}" class="button-link">
+                S'inscrire
+            </a>
+        </div>
+
+        <div class="login-panel">
+            <h1>Connectez-vous</h1>
+
+            <form method="post" class="content-form">
+                {% csrf_token %}
+
+                {{ form.non_field_errors }}
+
+                <div class="form-field">
+                    <label for="{{ form.username.id_for_label }}">
+                        Nom d'utilisateur
+                    </label>
+
+                    {{ form.username }}
+                    {{ form.username.errors }}
+                </div>
+
+                <div class="form-field">
+                    <label for="{{ form.password.id_for_label }}">
+                        Mot de passe
+                    </label>
+
+                    {{ form.password }}
+                    {{ form.password.errors }}
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit">
+                        Se connecter
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </section>
+{% endblock %}

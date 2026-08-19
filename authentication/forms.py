@@ -9,7 +9,19 @@ class LoginForm(forms.Form):
         widget=forms.PasswordInput
     )
 
+
 class SignupForm(UserCreationForm):
-    class Meta:
+    class Meta(UserCreationForm.Meta):
         model = User
         fields = ('username',)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['username'].label = "Nom d'utilisateur"
+        self.fields['password1'].label = "Mot de passe"
+        self.fields['password2'].label = "Confirmer le mot de passe"
+
+        self.fields['username'].help_text = ''
+        self.fields['password1'].help_text = ''
+        self.fields['password2'].help_text = ''

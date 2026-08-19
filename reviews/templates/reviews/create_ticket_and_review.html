@@ -1,26 +1,90 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Créer une critique - LITRevu</title>
-</head>
-<body>
-    <h1>Créer une critique</h1>
+{% extends 'base.html' %}
 
-    <h2>Livre / Article</h2>
+{% block title %}
+    Créer une critique - LITRevu
+{% endblock %}
 
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
+{% block content %}
+    <section class="form-page">
+        <h1>Créer une critique</h1>
 
-        {{ ticket_form.as_p }}
+        <form
+            method="post"
+            enctype="multipart/form-data"
+            class="content-form"
+        >
+            {% csrf_token %}
 
-        <h2>Critique</h2>
+            {{ ticket_form.non_field_errors }}
+            {{ review_form.non_field_errors }}
 
-        {{ review_form.as_p }}
+            <fieldset class="form-section">
+                <legend>Livre / Article</legend>
 
-        <button type="submit">Envoyer</button>
-    </form>
+                <div class="form-field">
+                    <label for="{{ ticket_form.title.id_for_label }}">
+                        Titre
+                    </label>
 
-    <a href="{% url 'feed' %}">Retour au flux</a>
-</body>
-</html>
+                    {{ ticket_form.title }}
+                    {{ ticket_form.title.errors }}
+                </div>
+
+                <div class="form-field">
+                    <label for="{{ ticket_form.description.id_for_label }}">
+                        Description
+                    </label>
+
+                    {{ ticket_form.description }}
+                    {{ ticket_form.description.errors }}
+                </div>
+
+                <div class="form-field">
+                    <label for="{{ ticket_form.image.id_for_label }}">
+                        Image
+                    </label>
+
+                    {{ ticket_form.image }}
+                    {{ ticket_form.image.errors }}
+                </div>
+            </fieldset>
+
+            <fieldset class="form-section">
+                <legend>Critique</legend>
+
+                <div class="form-field">
+                    <label for="{{ review_form.headline.id_for_label }}">
+                        Titre
+                    </label>
+
+                    {{ review_form.headline }}
+                    {{ review_form.headline.errors }}
+                </div>
+
+                <div class="form-field">
+                    <label for="{{ review_form.rating.id_for_label }}">
+                        Note
+                    </label>
+
+                    {{ review_form.rating }}
+                    {{ review_form.rating.errors }}
+                </div>
+
+                <div class="form-field">
+                    <label for="{{ review_form.body.id_for_label }}">
+                        Commentaire
+                    </label>
+
+                    {{ review_form.body }}
+                    {{ review_form.body.errors }}
+                </div>
+            </fieldset>
+
+            <div class="form-actions">
+                <button type="submit">
+                    Envoyer
+                </button>
+            </div>
+        </form>
+    </section>
+{% endblock %}

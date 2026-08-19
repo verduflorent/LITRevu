@@ -1,9 +1,7 @@
-from django.contrib.auth import authenticate, login
-from django.shortcuts import redirect, render
 from django.contrib.auth import authenticate, login, logout
+from django.shortcuts import redirect, render
 
 from .forms import LoginForm, SignupForm
-
 
 
 def login_page(request):
@@ -26,15 +24,22 @@ def login_page(request):
                 login(request, user)
                 return redirect('feed')
 
+            form.add_error(
+                None,
+                "Nom d'utilisateur ou mot de passe incorrect."
+            )
+
     return render(
         request,
         'authentication/login.html',
         {'form': form},
     )
 
+
 def logout_user(request):
     logout(request)
     return redirect('login')
+
 
 def signup_page(request):
     form = SignupForm()

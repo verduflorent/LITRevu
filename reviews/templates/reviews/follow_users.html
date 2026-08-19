@@ -1,52 +1,72 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Abonnements - LITRevu</title>
-</head>
-<body>
-    <h1>Suivre d'autres utilisateurs</h1>
+{% extends 'base.html' %}
 
-    {% if messages %}
-        {% for message in messages %}
-            <p>{{ message }}</p>
-        {% endfor %}
-    {% endif %}
+{% block title %}
+    Abonnements - LITRevu
+{% endblock %}
 
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
+{% block content %}
 
-        <button type="submit">Suivre</button>
-    </form>
+    <section class="follows-page">
+        <h1>Suivre d'autres utilisateurs</h1>
 
-    <h2>Abonnements</h2>
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
 
-    {% for follow in following %}
-        <p>
-            {{ follow.followed_user.username }}
+        <form method="post" class="follow-form">
+            {% csrf_token %}
 
-            <form
-                method="post"
-                action="{% url 'unfollow_user' follow.followed_user.id %}"
-                style="display: inline;"
-            >
-                {% csrf_token %}
-                <button type="submit">Se désabonner</button>
-            </form>
-        </p>
-    {% empty %}
-        <p>Vous ne suivez personne.</p>
-    {% endfor %}
+            <label for="{{ form.username.id_for_label }}">
+                Nom d'utilisateur
+            </label>
 
-    <h2>Abonnés</h2>
+            {{ form.username }}
+            {{ form.username.errors }}
 
-    {% for follow in followers %}
-        <p>{{ follow.user.username }}</p>
-    {% empty %}
-        <p>Vous n'avez aucun abonné.</p>
-    {% endfor %}
+            <button type="submit">
+                Envoyer
+            </button>
+        </form>
 
-    <a href="{% url 'feed' %}">Retour au flux</a>
-</body>
-</html>
+        <h2>Abonnements</h2>
+
+        <div class="follow-list">
+            {% for follow in following %}
+                <div class="follow-row">
+                    <span>
+                        {{ follow.followed_user.username }}
+                    </span>
+
+                    <form
+                        method="post"
+                        action="{% url 'unfollow_user' follow.followed_user.id %}"
+                    >
+                        {% csrf_token %}
+                        <button type="submit">
+                            Désabonner
+                        </button>
+                    </form>
+                </div>
+            {% empty %}
+                <p>Vous ne suivez personne.</p>
+            {% endfor %}
+        </div>
+
+        <h2>Abonnés</h2>
+
+        <div class="follow-list">
+            {% for follow in followers %}
+                <div class="follow-row">
+                    <span>{{ follow.user.username }}</span>
+                </div>
+            {% empty %}
+                <p>Vous n'avez aucun abonné.</p>
+            {% endfor %}
+        </div>
+    </section>
+
+{% endblock %}

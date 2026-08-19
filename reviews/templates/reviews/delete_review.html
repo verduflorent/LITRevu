@@ -1,22 +1,33 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Supprimer une critique - LITRevu</title>
-</head>
-<body>
-    <h1>Supprimer votre critique</h1>
+{% extends 'base.html' %}
 
-    <p>
-        Voulez-vous vraiment supprimer
-        « {{ review.headline }} » ?
-    </p>
+{% block title %}
+    Supprimer une critique - LITRevu
+{% endblock %}
 
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit">Supprimer</button>
-    </form>
+{% block content %}
+    <section class="delete-page">
+        <h1>Supprimer la critique</h1>
 
-    <a href="{% url 'feed' %}">Annuler</a>
-</body>
-</html>
+        <div class="delete-box">
+            <p>
+                Voulez-vous vraiment supprimer
+                <strong>« {{ review.headline }} »</strong> ?
+            </p>
+
+            <p>Cette action est définitive.</p>
+
+            <div class="delete-actions">
+                <a href="{% url 'feed' %}" class="button-link">
+                    Annuler
+                </a>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="danger-button">
+                        Supprimer
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+{% endblock %}
