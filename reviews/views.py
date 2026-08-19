@@ -1,8 +1,8 @@
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, redirect, render
-from django.contrib.auth import get_user_model
 from django.contrib import messages
+from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import FollowUserForm, ReviewForm, TicketForm
 from .models import Review, Ticket, UserFollows
@@ -16,7 +16,7 @@ def feed(request):
         user=request.user
     ).values_list(
         'followed_user',
-        flat=True
+        flat=True,
     )
 
     tickets = Ticket.objects.filter(
@@ -35,7 +35,7 @@ def feed(request):
             user=request.user
         ).values_list(
             'ticket_id',
-            flat=True
+            flat=True,
         )
     )
 
@@ -50,7 +50,7 @@ def feed(request):
 
     posts.sort(
         key=lambda post: post.time_created,
-        reverse=True
+        reverse=True,
     )
 
     return render(
@@ -60,6 +60,7 @@ def feed(request):
             'posts': posts,
         },
     )
+
 
 @login_required
 def create_ticket(request):
@@ -81,12 +82,13 @@ def create_ticket(request):
         {'form': form},
     )
 
+
 @login_required
 def edit_ticket(request, ticket_id):
     ticket = get_object_or_404(
-    Ticket,
-    id=ticket_id,
-    user=request.user
+        Ticket,
+        id=ticket_id,
+        user=request.user,
     )
 
     form = TicketForm(instance=ticket)
@@ -95,7 +97,7 @@ def edit_ticket(request, ticket_id):
         form = TicketForm(
             request.POST,
             request.FILES,
-            instance=ticket
+            instance=ticket,
         )
 
         if form.is_valid():
@@ -108,12 +110,13 @@ def edit_ticket(request, ticket_id):
         {'form': form},
     )
 
+
 @login_required
 def delete_ticket(request, ticket_id):
     ticket = get_object_or_404(
         Ticket,
         id=ticket_id,
-        user=request.user
+        user=request.user,
     )
 
     if request.method == 'POST':
@@ -126,17 +129,18 @@ def delete_ticket(request, ticket_id):
         {'ticket': ticket},
     )
 
+
 @login_required
 def create_review(request, ticket_id):
     ticket = get_object_or_404(Ticket, id=ticket_id)
 
     if Review.objects.filter(
         ticket=ticket,
-        user=request.user
+        user=request.user,
     ).exists():
         messages.error(
             request,
-            "Vous avez déjà publié une critique pour ce ticket."
+            "Vous avez déjà publié une critique pour ce ticket.",
         )
         return redirect('feed')
 
@@ -162,12 +166,13 @@ def create_review(request, ticket_id):
         },
     )
 
+
 @login_required
 def edit_review(request, review_id):
     review = get_object_or_404(
         Review,
         id=review_id,
-        user=request.user
+        user=request.user,
     )
 
     form = ReviewForm(instance=review)
@@ -185,12 +190,13 @@ def edit_review(request, review_id):
         {'form': form},
     )
 
+
 @login_required
 def delete_review(request, review_id):
     review = get_object_or_404(
         Review,
         id=review_id,
-        user=request.user
+        user=request.user,
     )
 
     if request.method == 'POST':
@@ -202,6 +208,7 @@ def delete_review(request, review_id):
         'reviews/delete_review.html',
         {'review': review},
     )
+
 
 @login_required
 def create_ticket_and_review(request):
@@ -233,6 +240,7 @@ def create_ticket_and_review(request):
         },
     )
 
+
 @login_required
 def follow_users(request):
     form = FollowUserForm()
@@ -248,31 +256,31 @@ def follow_users(request):
             except User.DoesNotExist:
                 messages.error(
                     request,
-                    "Cet utilisateur n'existe pas."
+                    "Cet utilisateur n'existe pas.",
                 )
                 return redirect('follow_users')
 
             if followed_user == request.user:
                 messages.error(
                     request,
-                    "Vous ne pouvez pas vous suivre vous-même."
+                    "Vous ne pouvez pas vous suivre vous-même.",
                 )
                 return redirect('follow_users')
 
             follow, created = UserFollows.objects.get_or_create(
                 user=request.user,
-                followed_user=followed_user
+                followed_user=followed_user,
             )
 
             if created:
                 messages.success(
                     request,
-                    "Utilisateur suivi."
+                    "Utilisateur suivi.",
                 )
             else:
                 messages.info(
                     request,
-                    "Vous suivez déjà cet utilisateur."
+                    "Vous suivez déjà cet utilisateur.",
                 )
 
             return redirect('follow_users')
@@ -295,23 +303,25 @@ def follow_users(request):
         },
     )
 
+
 @login_required
 def unfollow_user(request, user_id):
     followed_user = get_object_or_404(
         User,
-        id=user_id
+        id=user_id,
     )
 
     follow = get_object_or_404(
         UserFollows,
         user=request.user,
-        followed_user=followed_user
+        followed_user=followed_user,
     )
 
     if request.method == 'POST':
         follow.delete()
 
     return redirect('follow_users')
+
 
 @login_required
 def posts(request):
@@ -334,7 +344,7 @@ def posts(request):
             user=request.user
         ).values_list(
             'ticket_id',
-            flat=True
+            flat=True,
         )
     )
 
