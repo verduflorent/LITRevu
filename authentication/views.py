@@ -1,3 +1,5 @@
+"""Vues responsables de l'inscription et de la gestion des sessions."""
+
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import redirect, render
 
@@ -5,6 +7,7 @@ from .forms import LoginForm, SignupForm
 
 
 def login_page(request):
+    """Authentifie un utilisateur puis le redirige vers son flux."""
     form = LoginForm()
 
     if request.method == 'POST':
@@ -37,11 +40,13 @@ def login_page(request):
 
 
 def logout_user(request):
+    """Ferme la session courante et renvoie vers la page de connexion."""
     logout(request)
     return redirect('login')
 
 
 def signup_page(request):
+    """Crée un compte utilisateur à partir des données valides du formulaire."""
     form = SignupForm()
 
     if request.method == 'POST':

@@ -1,3 +1,5 @@
+"""Routes publiques liées à l'authentification."""
+
 from django.urls import path
 
 from . import views

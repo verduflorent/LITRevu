@@ -1,3 +1,5 @@
+"""Vues de gestion du flux, des publications et des abonnements."""
+
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
@@ -12,6 +14,9 @@ User = get_user_model()
 
 @login_required
 def feed(request):
+    """Affiche le flux personnalisé de l'utilisateur connecté."""
+    # Le flux contient les publications de l'utilisateur et de ses abonnements.
+    # On interroge la table UserFollows et on récupères toute les relations d'abonnement du User connecté
     followed_users = UserFollows.objects.filter(
         user=request.user
     ).values_list(
@@ -19,18 +24,22 @@ def feed(request):
         flat=True,
     )
 
+    # Dans la table Ticket on récupéres tout les ticket User ou Followed User
     tickets = Ticket.objects.filter(
         Q(user=request.user) |
         Q(user__in=followed_users)
     )
 
+    # Dans la table Review on récupère en plus les Réponses au Tickets du User
     reviews = Review.objects.filter(
         Q(user=request.user) |
         Q(user__in=followed_users) |
         Q(ticket__user=request.user)
     )
 
+    # Cet ensemble évite de proposer une seconde critique du même ticket.
     reviewed_ticket_ids = set(
+        # On cherche les tickets auquel le User a répondu et on extrait les ID
         Review.objects.filter(
             user=request.user
         ).values_list(
@@ -40,23 +49,32 @@ def feed(request):
     )
 
     for ticket in tickets:
+        # Ces attributs temporaires pilotent le rendu commun des publications.
+        # On ajoute temporairement une propriété python pour savoir si l'objet est un ticket
         ticket.content_type = 'TICKET'
+        # On compares les Id pour savoir si le User a deja répondu a la review avec un ticket
         ticket.can_review = ticket.id not in reviewed_ticket_ids
+        # Si le test renvoie True alors le User peut répondre a la Review
 
     for review in reviews:
         review.content_type = 'REVIEW'
 
+    # On crée une collection python commune pour harmoniser les modèles QuerySets Django
     posts = list(tickets) + list(reviews)
 
     posts.sort(
+        # On trie chaque objet en fonction de sa date + heure de création
         key=lambda post: post.time_created,
+        # Le reverse True permet d'inverser l'ordre chronologique pour afficher en premier les posts récents
         reverse=True,
     )
 
     return render(
+        # On transmet la requete et on indique le template Django à utiliser
         request,
         'reviews/feed.html',
         {
+            # On transmet au template la collection d'objet a afficher
             'posts': posts,
         },
     )
@@ -64,6 +82,7 @@ def feed(request):
 
 @login_required
 def create_ticket(request):
+    """Crée un ticket au nom de l'utilisateur connecté."""
     form = TicketForm()
 
     if request.method == 'POST':
@@ -85,6 +104,7 @@ def create_ticket(request):
 
 @login_required
 def edit_ticket(request, ticket_id):
+    """Modifie un ticket uniquement si l'utilisateur courant en est l'auteur."""
     ticket = get_object_or_404(
         Ticket,
         id=ticket_id,
@@ -113,6 +133,7 @@ def edit_ticket(request, ticket_id):
 
 @login_required
 def delete_ticket(request, ticket_id):
+    """Supprime après confirmation un ticket appartenant à l'utilisateur."""
     ticket = get_object_or_404(
         Ticket,
         id=ticket_id,
@@ -132,6 +153,7 @@ def delete_ticket(request, ticket_id):
 
 @login_required
 def create_review(request, ticket_id):
+    """Publie une unique critique de l'utilisateur pour le ticket demandé."""
     ticket = get_object_or_404(Ticket, id=ticket_id)
 
     if Review.objects.filter(
@@ -169,6 +191,7 @@ def create_review(request, ticket_id):
 
 @login_required
 def edit_review(request, review_id):
+    """Modifie une critique appartenant à l'utilisateur connecté."""
     review = get_object_or_404(
         Review,
         id=review_id,
@@ -193,6 +216,7 @@ def edit_review(request, review_id):
 
 @login_required
 def delete_review(request, review_id):
+    """Supprime après confirmation une critique appartenant à l'utilisateur."""
     review = get_object_or_404(
         Review,
         id=review_id,
@@ -212,6 +236,7 @@ def delete_review(request, review_id):
 
 @login_required
 def create_ticket_and_review(request):
+    """Crée en une opération un ticket et la critique qui lui répond."""
     ticket_form = TicketForm()
     review_form = ReviewForm()
 
@@ -243,6 +268,7 @@ def create_ticket_and_review(request):
 
 @login_required
 def follow_users(request):
+    """Ajoute un abonnement et affiche abonnements et abonnés de l'utilisateur."""
     form = FollowUserForm()
 
     if request.method == 'POST':
@@ -306,6 +332,7 @@ def follow_users(request):
 
 @login_required
 def unfollow_user(request, user_id):
+    """Supprime l'abonnement courant vers l'utilisateur indiqué."""
     followed_user = get_object_or_404(
         User,
         id=user_id,
@@ -325,6 +352,7 @@ def unfollow_user(request, user_id):
 
 @login_required
 def posts(request):
+    """Affiche les publications de l'utilisateur et les réponses reçues."""
     tickets = Ticket.objects.filter(
         user=request.user
     )

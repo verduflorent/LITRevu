@@ -1,3 +1,5 @@
+"""Routes des tickets, critiques, flux et abonnements."""
+
 from django.urls import path
 
 from . import views

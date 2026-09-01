@@ -1,1 +1,1 @@
-# Tests will be added in a future iteration.
+# Les tests seront ajoutés lors d'une prochaine itération.

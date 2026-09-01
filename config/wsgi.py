@@ -1,10 +1,7 @@
-"""
-WSGI config for config project.
+"""Point d'entrée WSGI du projet LITRevu.
 
-It exposes the WSGI callable as a module-level variable named ``application``.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/5.2/howto/deployment/wsgi/
+La variable de module ``application`` est utilisée par les serveurs web
+compatibles WSGI lors du déploiement.
 """
 
 import os
